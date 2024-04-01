@@ -1,19 +1,41 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+<FluentDesignTheme 
+    Mode="DesignThemeModes.Light" 
+    OfficeColor="OfficeColor.GroupMe" />
+<FluentMainLayout 
+    NavMenuTitle="Navigation menu" 
+    HeaderHeight="0">
+    <Header>
+        <FluentEmoji Value="@(new Emojis.Objects.HighContrast.Default.SatelliteAntenna())" />
+        <h1>Blazor Server Sample</h1>
+        Blazor Server Sample
+    </Header>
+    <Body>
+        @Body
+    </Body>
+    <NavMenuContent>
 
-    <main>
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+        <FluentNavLink 
+            Icon="@(new Icons.Regular.Size24.Home())"
+            Href="/weather"
+            Tooltip="This component demonstrates showing data">
+            Weather
+        </FluentNavLink>
 
-<div id="blazor-error-ui">
-    An unhandled error has occurred.
-    <a href="" class="reload">Reload</a>
-    <a class="dismiss">🗙</a>
-</div>
+        <FluentNavLink 
+            Icon="@(new Icons.Regular.Size24.ArrowCounterclockwise())"
+            Href="/counter"
+            Tooltip="counter">
+            Counter
+        </FluentNavLink>
+
+    </NavMenuContent>
+</FluentMainLayout>
+
+<FluentToastProvider />
+<FluentDialogProvider />
+<FluentTooltipProvider />
+<FluentMessageBarProvider />
+
+<BlazorError />

@@ -4,9 +4,16 @@
 
 <h1>Counter</h1>
 
-<p role="status">Current count: @currentCount</p>
+<FluentCard>
+    <h2>Hi Mom!</h2>
+    <FluentButton 
+        Appearance="@Appearance.Accent" 
+        @onclick="IncrementCount">
+        Click Me
+    </FluentButton>
+</FluentCard>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<p role="status">Current count: @currentCount</p>
 
 @code {
     private int currentCount = 0;

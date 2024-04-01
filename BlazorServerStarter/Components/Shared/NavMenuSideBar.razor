@@ -1,0 +1,25 @@
+﻿<FluentNavMenu 
+    @bind-Expanded="@IsExpanded"
+    Width="250" 
+    Collapsible="true" 
+    Title="Collapsible demo">
+    
+    <FluentNavLink 
+        Icon="@(new Icons.Regular.Size24.Home())"
+        Href="/weather"
+        Tooltip="Item 1 tooltip">
+        Weather
+    </FluentNavLink>
+    
+    <FluentNavLink Icon="@(new Icons.Regular.Size24.ArrowCounterclockwise())" 
+        Href="/counter"
+        Tooltip="counter">
+        Counter
+    </FluentNavLink>
+
+</FluentNavMenu>
+
+@code
+{
+    private bool IsExpanded { get; set; } = false;
+}
