@@ -8,51 +8,84 @@
     This component demonstrates showing data.
 </div>
 
-@if (forecasts == null)
-{
-    <p><em>Loading...</em></p>
-}
-else
-{
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Date</th>
-                <th>Temp. (C)</th>
-                <th>Temp. (F)</th>
-                <th>Summary</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var forecast in forecasts)
-            {
-                <tr>
-                    <td>@forecast.Date.ToShortDateString()</td>
-                    <td>@forecast.TemperatureC</td>
-                    <td>@forecast.TemperatureF</td>
-                    <td>@forecast.Summary</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-}
+<FluentDataGrid 
+    @ref="GridRef"
+    Items=@Forecasts
+    ResizableColumns="true"
+    Virtualize="true" 
+    ItemSize="54" 
+    GridTemplateColumns="1fr 1fr 1fr 1fr" 
+    Style="height: 100%;">
+    <ChildContent>
+        <PropertyColumn
+            Title="Date Recorded"
+            Property="@(wf => wf.Date.ToShortDateString())" 
+            Align="Align.Start" Sortable="true" />
+        <PropertyColumn 
+            Property="@(wf => wf.TemperatureC)" 
+            Sortable="true" />
+        <PropertyColumn 
+            Property="@(wf => wf.TemperatureF)" 
+            Align="Align.Start" 
+            Sortable="true" />
+        <PropertyColumn 
+            Property="@(wf => wf.Summary)" 
+            Align="Align.Start" 
+            Sortable="true" />
+    </ChildContent>
+    <EmptyContent>
+        <FluentIcon 
+            Value="@(new Icons.Filled.Size24.Crown())" 
+            Color="@Color.Accent" />
+            &nbsp; Nothing to see here. Carry on!
+    </EmptyContent>
+    <LoadingContent>
+        <FluentStack 
+            Orientation="Orientation.Vertical" 
+            HorizontalAlignment="HorizontalAlignment.Center">
+            Loading...<br />
+            <FluentProgress Width="240px" />
+        </FluentStack>
+    </LoadingContent>
+</FluentDataGrid>
 
 @code {
-    private WeatherForecast[]? forecasts;
+    private IQueryable<WeatherForecast>? Forecasts;
+
+    private FluentDataGrid<WeatherForecast>? GridRef;
 
     protected override async Task OnInitializedAsync()
     {
+        GridRef?.SetLoadingState(true);
+
         // Simulate asynchronous loading to demonstrate a loading indicator
         await Task.Delay(500);
 
         var startDate = DateOnly.FromDateTime(DateTime.Now);
-        var summaries = new[] { "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching" };
-        forecasts = Enumerable.Range(1, 5).Select(index => new WeatherForecast
-        {
-            Date = startDate.AddDays(index),
-            TemperatureC = Random.Shared.Next(-20, 55),
-            Summary = summaries[Random.Shared.Next(summaries.Length)]
-        }).ToArray();
+        
+        var summaries = new[] { 
+            "Freezing", 
+            "Bracing",
+            "Chilly", 
+            "Cool", 
+            "Mild", 
+            "Warm", 
+            "Balmy", 
+            "Hot", 
+            "Sweltering", 
+            "Scorching" 
+        };
+
+        Forecasts = Enumerable.Range(1, 5)
+            .Select(index => new WeatherForecast
+            {
+                Date = startDate.AddDays(index),
+                TemperatureC = Random.Shared.Next(-20, 55),
+                Summary = summaries[Random.Shared.Next(summaries.Length)]
+            })
+            .AsQueryable();
+
+        // GridRef?.SetLoadingState(false);
     }
 
     private class WeatherForecast
