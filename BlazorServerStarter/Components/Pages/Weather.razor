@@ -1,6 +1,8 @@
 ﻿@page "/"
 @page "/weather"
 
+@inject IWeatherForecastService WeatherForecastService
+
 <PageTitle>Weather Forecast</PageTitle>
 
 <div class="display-6">Weather Forecast</div>
@@ -8,91 +10,61 @@
     This component demonstrates showing data.
 </div>
 
-<FluentDataGrid 
-    @ref="GridRef"
-    Items=@Forecasts
-    ResizableColumns="true"
-    Virtualize="true" 
-    ItemSize="54" 
-    GridTemplateColumns="1fr 1fr 1fr 1fr" 
-    Style="height: 100%;">
-    <ChildContent>
-        <PropertyColumn
-            Title="Date Recorded"
-            Property="@(wf => wf.Date.ToShortDateString())" 
-            Align="Align.Start" Sortable="true" />
-        <PropertyColumn 
-            Property="@(wf => wf.TemperatureC)" 
-            Sortable="true" />
-        <PropertyColumn 
-            Property="@(wf => wf.TemperatureF)" 
-            Align="Align.Start" 
-            Sortable="true" />
-        <PropertyColumn 
-            Property="@(wf => wf.Summary)" 
-            Align="Align.Start" 
-            Sortable="true" />
-    </ChildContent>
-    <EmptyContent>
-        <FluentIcon 
-            Value="@(new Icons.Filled.Size24.Crown())" 
-            Color="@Color.Accent" />
-            &nbsp; Nothing to see here. Carry on!
-    </EmptyContent>
-    <LoadingContent>
-        <FluentStack 
-            Orientation="Orientation.Vertical" 
-            HorizontalAlignment="HorizontalAlignment.Center">
-            Loading...<br />
-            <FluentProgress Width="240px" />
-        </FluentStack>
-    </LoadingContent>
-</FluentDataGrid>
+<div class="overflow-scroll">
+    <FluentDataGrid
+        @ref="GridRef"
+        Items=@ForecastByHour
+        ResizableColumns="true"
+        Virtualize="true" 
+        ItemSize="54" 
+        Style="height: 80vh;">
+        <ChildContent>
+            <PropertyColumn Style="width: 300px" Title="Time Recorded" Property="@(wf => wf.Time)" Align="Align.Start" Sortable="true" />
+            <PropertyColumn Class="w-100" Property="@(wf => wf.TemperatureInC)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.TemperatureInF)" Sortable="true" />
+            <PropertyColumn Title="Cloud Cover" Property="@(wf => wf.Cloud)" Sortable="true" />
+            <PropertyColumn Title="UV" Property="@(wf => wf.UltraVioletLevel)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.ChanceOfRain)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.Condition.Text)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.FeelsLikeTemperatureInF)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.HeatIndexInF)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.Humidity)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.PressureInMillibars)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.WillItRain)" Sortable="true" />
+            <PropertyColumn Property="@(wf => wf.WindDirection)" Sortable="true" />
+        </ChildContent>
+        <EmptyContent>
+            <FluentIcon 
+                Value="@(new Icons.Filled.Size24.Crown())" 
+                Color="@Color.Accent" />
+                &nbsp; Nothing to see here. Carry on!
+        </EmptyContent>
+        <LoadingContent>
+            <FluentStack 
+                Orientation="Orientation.Vertical" 
+                HorizontalAlignment="HorizontalAlignment.Center">
+                Loading...<br />
+                <FluentProgress Width="240px" />
+            </FluentStack>
+        </LoadingContent>
+    </FluentDataGrid>
+</div>
 
 @code {
-    private IQueryable<WeatherForecast>? Forecasts;
+    private FluentDataGrid<Hour>? GridRef;
+    private WeatherForecast? weatherForecast;
+    private IQueryable<Hour>? ForecastByHour;
 
-    private FluentDataGrid<WeatherForecast>? GridRef;
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        GridRef?.SetLoadingState(true);
+        if (firstRender)
+        {
+            GridRef?.SetLoadingState(true);
+            var weatherForecast = await WeatherForecastService.GetForecastForJacksonvilleAsync();
 
-        // Simulate asynchronous loading to demonstrate a loading indicator
-        await Task.Delay(500);
-
-        var startDate = DateOnly.FromDateTime(DateTime.Now);
-        
-        var summaries = new[] { 
-            "Freezing", 
-            "Bracing",
-            "Chilly", 
-            "Cool", 
-            "Mild", 
-            "Warm", 
-            "Balmy", 
-            "Hot", 
-            "Sweltering", 
-            "Scorching" 
-        };
-
-        Forecasts = Enumerable.Range(1, 5)
-            .Select(index => new WeatherForecast
-            {
-                Date = startDate.AddDays(index),
-                TemperatureC = Random.Shared.Next(-20, 55),
-                Summary = summaries[Random.Shared.Next(summaries.Length)]
-            })
-            .AsQueryable();
-
-        // GridRef?.SetLoadingState(false);
-    }
-
-    private class WeatherForecast
-    {
-        public DateOnly Date { get; set; }
-        public int TemperatureC { get; set; }
-        public string? Summary { get; set; }
-        public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+            ForecastByHour = weatherForecast?.Forecast?.ForecastDay?.FirstOrDefault()?.Hour?.AsQueryable();              
+            GridRef?.SetLoadingState(false);
+            StateHasChanged();
+        }
     }
 }

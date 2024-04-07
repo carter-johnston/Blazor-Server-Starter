@@ -1,15 +1,25 @@
 using BlazorServerStarter.Components;
+using BlazorServerStarter.Configuration;
+using BlazorServerStarter.Services;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.FluentUI.AspNetCore.Components;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorComponents()
+var config = builder.Configuration;
+var services = builder.Services;
+
+services.Configure<WeatherApiClientSettings>(config.GetSection("WeatherApiV1"));
+
+services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient();
-builder.Services.AddFluentUIComponents();
+services.AddHttpClient();
+services.AddFluentUIComponents();
 
+services.AddHttpClient<IWeatherForecastService, WeatherForecastService>();
 
+services.AddScoped<IWeatherForecastService, WeatherForecastService>();
 
 var app = builder.Build();
 
