@@ -1,5 +1,6 @@
 ﻿@page "/"
 @page "/weather"
+@using BlazorServerStarter.Utility
 
 @inject IWeatherForecastService WeatherForecastService
 
@@ -19,13 +20,37 @@
         ItemSize="54" 
         Style="height: 80vh;">
         <ChildContent>
-            <PropertyColumn Style="width: 300px" Title="Time Recorded" Property="@(wf => wf.Time)" Align="Align.Start" Sortable="true" />
-            <PropertyColumn Class="w-100" Property="@(wf => wf.TemperatureInC)" Sortable="true" />
-            <PropertyColumn Property="@(wf => wf.TemperatureInF)" Sortable="true" />
+
+            <PropertyColumn  
+                Title="Time Recorded"
+                Property="@(wf => wf.Time)" 
+                Align="Align.Start"
+                Sortable="true" />
+
+            <TemplateColumn Title="">
+                @(context.TemperatureInC) °C
+            </TemplateColumn>
+
+            <TemplateColumn Title="">
+                @(context.FeelsLikeTemperatureInF) °F
+            </TemplateColumn>
+
+            <TemplateColumn
+                Style="Width: 200px"
+                Tooltip="true" 
+                TooltipText="@(wf => wf.Condition.Text)" 
+                Title="">
+               <FluentEmoji 
+                   Value="@(WeatherForecastUtil.TranslateWeatherConditionToEmoji(context.Condition.Text))">
+               </FluentEmoji>
+               <span class="text-muted">
+                    @context.Condition.Text
+               </span>
+            </TemplateColumn>
+
             <PropertyColumn Title="Cloud Cover" Property="@(wf => wf.Cloud)" Sortable="true" />
             <PropertyColumn Title="UV" Property="@(wf => wf.UltraVioletLevel)" Sortable="true" />
             <PropertyColumn Property="@(wf => wf.ChanceOfRain)" Sortable="true" />
-            <PropertyColumn Property="@(wf => wf.Condition.Text)" Sortable="true" />
             <PropertyColumn Property="@(wf => wf.FeelsLikeTemperatureInF)" Sortable="true" />
             <PropertyColumn Property="@(wf => wf.HeatIndexInF)" Sortable="true" />
             <PropertyColumn Property="@(wf => wf.Humidity)" Sortable="true" />
@@ -60,9 +85,12 @@
         if (firstRender)
         {
             GridRef?.SetLoadingState(true);
+            StateHasChanged();
+
             var weatherForecast = await WeatherForecastService.GetForecastForJacksonvilleAsync();
 
             ForecastByHour = weatherForecast?.Forecast?.ForecastDay?.FirstOrDefault()?.Hour?.AsQueryable();              
+            
             GridRef?.SetLoadingState(false);
             StateHasChanged();
         }

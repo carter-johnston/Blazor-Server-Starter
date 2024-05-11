@@ -24,7 +24,7 @@ public class WeatherForecastService(IHttpClientFactory _httpClientFactory,
             var content = await response.Content.ReadAsStringAsync();
 
             result = JsonConvert.DeserializeObject<WeatherForecast>(content) 
-                ?? new();
+                ?? new WeatherForecast();
         }
 
         return result;

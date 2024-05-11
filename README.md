@@ -1,2 +1,5 @@
-# Blazor Server Starter
-A single assembly solution that I am using to easily spin up a Blazor web project. this is architected for the ability to spin up a quick project while maintaining a concise architecture.
+# Real Weather Forecast
+A Blazor web application sample that demonstrates the following:
+* A simple project structure utilizing the Server Interactive rendermode.
+* Using a Fluent UI component library
+* Using strongly typed HttpClients

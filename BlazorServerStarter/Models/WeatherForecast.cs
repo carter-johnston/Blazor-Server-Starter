@@ -239,7 +239,7 @@ public class Day
     public bool? DailyWillItRain { get; set; }
 
     [JsonProperty("daily_chance_of_rain")]
-    public int? daily_chance_of_rain { get; set; }
+    public int? DailyChanceOfRain { get; set; }
 
     [JsonProperty("daily_chance_of_snow")]
     public int? DailyChanceOfSnow { get; set; }
